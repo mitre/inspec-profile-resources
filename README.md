@@ -76,12 +76,28 @@ environment heuristics, not Kubernetes API queries.
 
 ## Development
 
-Use Ruby 3.1 or later for the pinned InSpec 5 development runtime.
+Use Ruby 3.2 or later for the pinned CINC Auditor 7.2.1 / InSpec 7.2.1
+development runtime. CI uses Ruby 3.2.
 
 ```sh
 bundle install
+bundle exec rake inspec:check
+bundle exec rake lint
 bundle exec ruby test/virtualization_test.rb
 bundle exec ruby test/dependency_test.rb
+```
+
+Linting uses the sibling profiles' RuboCop rules, with `libraries/` included
+and downloaded dependencies under `vendor/` excluded. GitHub Actions runs
+profile validation and `bundle exec rake lint` on pull requests and pushes to `main`. To focus on
+the virtualization resource, run `bundle exec rubocop libraries/virtualization.rb`.
+
+If native gem installation on macOS fails with an SDK `unknown architecture`
+linker error, select an installed SDK compatible with your compiler. For example,
+if `/Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk` exists:
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk bundle install
 ```
 
 The first test exercises container classification and detection with target
