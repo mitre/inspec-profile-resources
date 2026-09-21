@@ -4,7 +4,7 @@ require 'inspec/resources/powershell'
 # Profile libraries are evaluated in an isolated context; reopen the global module.
 module ::Inspec
   module Resources
-    class Virtualization < Inspec.resource(1)
+    class Virtualization < ::Inspec.resource(1)
       name 'virtualization'
       supports platform: 'unix'
       supports platform: 'windows'

@@ -8,6 +8,27 @@ require 'inspec'
 # exercise InSpec's resource-pack dependency loader rather than a direct load.
 class DependencyTest < Minitest::Test
   def test_consumer_loads_shared_virtualization_resource
+    assert_consumer_loads_shared_resource
+  end
+
+  def test_consumer_loads_with_builtin_virtualization_already_loaded
+    require 'inspec/resources/virtualization'
+    builtin = Inspec::Resources::Virtualization
+    parent_class = builtin.superclass
+
+    assert_consumer_loads_shared_resource
+
+    assert_same builtin, Inspec::Resources::Virtualization
+    assert_same parent_class, builtin.superclass
+  end
+
+  def test_independent_consumers_load_in_the_same_process
+    2.times { assert_consumer_loads_shared_resource }
+  end
+
+  private
+
+  def assert_consumer_loads_shared_resource
     Dir.mktmpdir('virtualization-consumer-') do |directory|
       pack = File.expand_path('..', __dir__)
       metadata = {
