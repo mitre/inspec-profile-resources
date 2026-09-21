@@ -55,8 +55,8 @@ class VirtualizationTest < Minitest::Test
 
   def test_podman_with_cgroup_v2
     assert_container resource(files: {
-      '/proc/self/cgroup' => '0::/', '/proc/1/environ' => "container=podman\0"
-    }), 'podman'
+                                '/proc/self/cgroup' => '0::/', '/proc/1/environ' => "container=podman\0"
+                              }), 'podman'
   end
 
   def test_kubernetes_cgroup
@@ -81,15 +81,15 @@ class VirtualizationTest < Minitest::Test
 
   def test_kubernetes_takes_precedence_over_docker_marker
     assert_container resource(files: {
-      '/.dockerenv' => '', '/var/run/secrets/kubernetes.io/serviceaccount' => ''
-    }), 'kubepods'
+                                '/.dockerenv' => '', '/var/run/secrets/kubernetes.io/serviceaccount' => ''
+                              }), 'kubepods'
   end
 
   def test_unrelated_mountinfo_and_environment_are_not_kubernetes
     instance = resource(files: {
-      '/proc/self/mountinfo' => '42 21 0:17 / /proc rw',
-      '/proc/1/environ' => "PATH=/bin\0HOME=/root\0"
-    })
+                          '/proc/self/mountinfo' => '42 21 0:17 / /proc rw',
+                          '/proc/1/environ' => "PATH=/bin\0HOME=/root\0"
+                        })
     refute instance.container_system?
     assert instance.physical_system?
   end
@@ -113,21 +113,21 @@ class VirtualizationTest < Minitest::Test
 
   def test_systemd_failure_is_not_a_container
     refute resource(commands: {
-      'systemd-detect-virt' => { exit_status: 1, stdout: "docker\n" }
-    }).container_system?
+                      'systemd-detect-virt' => { exit_status: 1, stdout: "docker\n" }
+                    }).container_system?
   end
 
   def test_empty_systemd_output_is_not_a_container
     refute resource(commands: {
-      'systemd-detect-virt' => { exit_status: 0, stdout: "\n" }
-    }).container_system?
+                      'systemd-detect-virt' => { exit_status: 0, stdout: "\n" }
+                    }).container_system?
   end
 
   Inspec::Resources::Virtualization::CONTAINER_SYSTEMS.each do |system|
     define_method("test_systemd_container_#{system.tr('-', '_')}") do
       assert_container resource(commands: {
-        'systemd-detect-virt' => { exit_status: 0, stdout: "#{system}\n" }
-      }), system
+                                  'systemd-detect-virt' => { exit_status: 0, stdout: "#{system}\n" }
+                                }), system
     end
 
     define_method("test_container_host_#{system.tr('-', '_')}") do
@@ -140,8 +140,8 @@ class VirtualizationTest < Minitest::Test
   %w[kvm vmware xen hyper-v vbox unknown].each do |system|
     define_method("test_systemd_non_container_#{system.tr('-', '_')}") do
       refute resource(commands: {
-        'systemd-detect-virt' => { exit_status: 0, stdout: "#{system}\n" }
-      }).container_system?
+                        'systemd-detect-virt' => { exit_status: 0, stdout: "#{system}\n" }
+                      }).container_system?
     end
   end
 end

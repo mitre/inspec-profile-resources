@@ -1,0 +1,38 @@
+name: Lint & Check the Resource Pack
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+
+      - name: Run Bundle Install
+        run: bundle install
+
+      - name: Installed CINC Auditor
+        run: bundle exec cinc-auditor version
+
+      - name: Vendor the Resource Pack
+        run: bundle exec cinc-auditor vendor . --overwrite
+
+      - name: Check the InSpec resource pack
+        run: bundle exec rake inspec:check
+
+      - name: Lint resources and tests
+        run: bundle exec rake lint

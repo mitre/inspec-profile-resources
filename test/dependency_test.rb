@@ -43,8 +43,8 @@ class DependencyTest < Minitest::Test
       runner.add_target(directory)
       assert_equal 0, runner.run, runner.report.inspect
       results = runner.report.fetch(:profiles).flat_map { |profile| profile[:controls] || [] }
-        .select { |control| control[:id] == 'shared-virtualization' }
-        .flat_map { |control| control[:results] }
+                      .select { |control| control[:id] == 'shared-virtualization' }
+                      .flat_map { |control| control[:results] }
       assert_equal 4, results.length
       assert results.all? { |result| result[:status] == 'passed' }, results.inspect
     end
