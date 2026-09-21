@@ -61,7 +61,7 @@ depends:
 
 `container_system?` requires both a recognized container system and the `guest`
 role. A host running container software is not itself treated as a container.
-The recognized systems match the RHEL 9 implementation:
+The resource recognizes the following container systems:
 
 ```text
 container-other docker kubepods linux-vserver lxc lxc-libvirt openvz
