@@ -1,7 +1,8 @@
 require 'hashie/mash'
 require 'inspec/resources/powershell'
 
-module Inspec
+# Profile libraries are evaluated in an isolated context; reopen the global module.
+module ::Inspec
   module Resources
     class Virtualization < Inspec.resource(1)
       name 'virtualization'

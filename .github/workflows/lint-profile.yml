@@ -34,5 +34,11 @@ jobs:
       - name: Check the InSpec resource pack
         run: bundle exec rake inspec:check
 
+      - name: Test virtualization detection
+        run: bundle exec ruby test/virtualization_test.rb
+
+      - name: Test resource loading from a consuming profile
+        run: bundle exec ruby test/dependency_test.rb
+
       - name: Lint resources and tests
         run: bundle exec rake lint
