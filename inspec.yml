@@ -1,0 +1,13 @@
+name: inspec-profile-resources
+title: InSpec Profile Development Resources
+maintainer: MITRE SAF Team
+copyright: MITRE
+copyright_email: saf@groups.mitre.org
+license: Apache-2.0
+summary: Shared resources and libraries for MITRE InSpec profiles.
+description: A reusable InSpec resource pack for MITRE profile development, currently providing virtualization properties and container applicability helpers, including Kubernetes detection.
+version: 0.1.0
+inspec_version: ">= 4.0"
+
+supports:
+  - platform-family: linux
