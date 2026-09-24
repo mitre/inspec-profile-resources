@@ -59,6 +59,52 @@ class VirtualizationTest < Minitest::Test
                               }), 'podman'
   end
 
+  def test_podman_marker_without_cgroup_or_environment
+    assert_container resource(files: { '/run/.containerenv' => '' }), 'podman'
+  end
+
+  def test_podman_marker_with_unreadable_environment
+    assert_container resource(files: {
+                                '/run/.containerenv' => '', '/proc/self/cgroup' => '0::/', '/proc/1/environ' => nil
+                              }), 'podman'
+  end
+
+  def test_podman_marker_with_empty_environment
+    assert_container resource(files: {
+                                '/run/.containerenv' => '', '/proc/self/cgroup' => '0::/', '/proc/1/environ' => ''
+                              }), 'podman'
+  end
+
+  def test_podman_marker_with_host_vm_signals
+    assert_container resource(files: {
+                                '/run/.containerenv' => '', '/proc/cpuinfo' => 'QEMU Virtual CPU'
+                              }), 'podman'
+  end
+
+  def test_kubernetes_takes_precedence_over_podman_marker
+    assert_container resource(files: {
+                                '/run/.containerenv' => '', '/run/secrets/kubernetes.io/serviceaccount' => ''
+                              }), 'kubepods'
+  end
+
+  def test_docker_takes_precedence_over_podman_marker
+    assert_container resource(files: { '/run/.containerenv' => '', '/.dockerenv' => '' }), 'docker'
+  end
+
+  def test_legacy_lxc_cgroup
+    assert_container resource(files: { '/proc/self/cgroup' => '1:cpu:/lxc/test-container' }), 'lxc'
+  end
+
+  def test_legacy_docker_cgroup
+    assert_container resource(files: { '/proc/self/cgroup' => '1:cpu:/docker/test-container' }), 'docker'
+  end
+
+  def test_unreadable_environment_without_container_marker
+    instance = resource(files: { '/proc/1/environ' => nil, '/proc/self/cgroup' => '0::/' })
+    refute instance.container_system?
+    assert instance.physical_system?
+  end
+
   def test_kubernetes_cgroup
     assert_container resource(files: { '/proc/self/cgroup' => '1:cpu:/kubepods/pod123' }), 'kubepods'
   end

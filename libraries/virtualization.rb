@@ -216,6 +216,15 @@ module ::Inspec
         true
       end
 
+      # Detect Podman without requiring access to PID 1's environment.
+      def detect_podman
+        return false unless inspec.file('/run/.containerenv').exist?
+
+        @virtualization_data[:system] = 'podman'
+        @virtualization_data[:role] = 'guest'
+        true
+      end
+
       # Detect LXC/Docker/k8s/podman
       #
       # /proc/self/cgroup will look like this inside a docker container:
@@ -288,7 +297,7 @@ module ::Inspec
       def kubernetes_env?
         return false unless inspec.file('/proc/1/environ').exist?
 
-        environ = inspec.file('/proc/1/environ').content
+        environ = inspec.file('/proc/1/environ').content.to_s
         environ.include?('KUBERNETES_SERVICE_HOST=')
       end
 
@@ -368,6 +377,7 @@ module ::Inspec
         return if detect_xen
         return if detect_kubernetes_container
         return if detect_docker
+        return if detect_podman
         return if detect_virtualbox
         return if detect_lxd
         return if detect_container
